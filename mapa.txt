@@ -1,0 +1,13 @@
+# mapa.txt - Grafo de la isla (El Tesoro del Pirata)
+# Formato: origen, destino, costo
+Playa, Bosque, 2
+Playa, Montana, 5
+Bosque, Cueva, 3
+Bosque, Lago, 4
+Montana, Cueva, 6
+Montana, Volcan, 7
+Cueva, Ruinas, 2
+Cueva, Tesoro, 8
+Lago, Ruinas, 3
+Volcan, Ruinas, 4
+Ruinas, Tesoro, 1

@@ -1,0 +1,10 @@
+# ubicaciones.txt - Informacion de cada ubicacion en la isla
+# Formato: nombre, pista
+Playa, El bosque esconde el primer secreto del tesoro
+Bosque, La cueva guarda el siguiente paso en la oscuridad
+Montana, El volcan duerme bajo la cumbre nevada
+Cueva, Las ruinas antiguas tienen la llave del tesoro
+Lago, La montana se refleja en mis aguas cristalinas
+Volcan, El viento lleva cenizas al bosque cercano
+Ruinas, El tesoro aguarda al final del camino
+Tesoro, Has encontrado el brillante tesoro del pirata

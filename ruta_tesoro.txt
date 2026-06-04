@@ -1,0 +1,43 @@
+==================================================
+  RUTA AL TESORO DEL PIRATA
+==================================================
+
+Isla: El Tesoro del Pirata
+Inicio: Playa
+Tesoro: Tesoro
+
+UBICACIONES Y PISTAS:
+----------------------------------------
+  Volcan: "El viento lleva cenizas al bosque cercano" [Visitado]
+  Cueva: "Las ruinas antiguas tienen la llave del tesoro" [Visitado]
+  Bosque: "La cueva guarda el siguiente paso en la oscuridad" [Visitado]
+  Playa: "El bosque esconde el primer secreto del tesoro" [Visitado]
+  Montana: "El volcan duerme bajo la cumbre nevada" [Visitado]
+  Lago: "La montana se refleja en mis aguas cristalinas" [Visitado]
+  Tesoro: "Has encontrado el brillante tesoro del pirata" [Visitado]
+  Ruinas: "El tesoro aguarda al final del camino" [Visitado]
+
+CAMINO MAS CORTO (BFS):
+----------------------------------------
+Playa -> Montana -> Cueva -> Tesoro
+
+CAMINO OPTIMO (Dijkstra):
+----------------------------------------
+Playa -> Bosque -> Cueva -> Ruinas -> Tesoro
+
+  Detalle del costo:
+    Playa -> Bosque: 2
+    Bosque -> Cueva: 3
+    Cueva -> Ruinas: 2
+    Ruinas -> Tesoro: 1
+  Costo total: 8
+
+SECUENCIA DE PISTAS:
+----------------------------------------
+  1. Playa: "El bosque esconde el primer secreto del tesoro"
+  2. Bosque: "La cueva guarda el siguiente paso en la oscuridad"
+  3. Cueva: "Las ruinas antiguas tienen la llave del tesoro"
+  4. Ruinas: "El tesoro aguarda al final del camino"
+  5. Tesoro: "Has encontrado el brillante tesoro del pirata"
+
+==================================================

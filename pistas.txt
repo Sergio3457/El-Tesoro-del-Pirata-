@@ -1,0 +1,10 @@
+# pistas.txt - Arbol de decision para interpretar pistas
+# Formato: palabra_clave, ubicacion_sugerida
+bosque, Bosque
+cueva, Cueva
+ruinas, Ruinas
+tesoro, Tesoro
+playa, Playa
+lago, Lago
+montana, Montana
+volcan, Volcan
