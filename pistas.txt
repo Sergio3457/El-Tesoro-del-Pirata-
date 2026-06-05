@@ -1,10 +1,26 @@
-# pistas.txt - Arbol de decision para interpretar pistas
-# Formato: palabra_clave, ubicacion_sugerida
-bosque, Bosque
-cueva, Cueva
-ruinas, Ruinas
-tesoro, Tesoro
-playa, Playa
-lago, Lago
-montana, Montana
-volcan, Volcan
+# pistas.txt - Arbol de decisiones para interpretar pistas
+# Formato:
+#   Q:clave1|clave2|clave3   -> nodo pregunta (si la pista contiene alguna clave -> SI)
+#   Y:H:Ubicacion            -> rama SI, hoja con destino
+#   Y:Q:clave1|clave2        -> rama SI, otro nodo pregunta
+#   N:H:Ubicacion            -> rama NO, hoja con destino
+#   N:Q:clave1|clave2        -> rama NO, otro nodo pregunta
+#   N:H:                     -> rama NO sin resultado
+#
+Q:oscuridad|sol no llega|oscura|sombra|no llega
+Y:H:Cueva
+N:Q:reflejo|cristalino|aguas|lago
+Y:H:Lago
+N:Q:fuego|volcan|ceniza|humo|lava
+Y:H:Volcan
+N:Q:tiempo olvido|columnas|jeroglifico|piedras antiguas|antiguas
+Y:H:Ruinas
+N:Q:oro|tesoro|brillo|joyas|camara
+Y:H:Tesoro
+N:Q:arboles|hojas|sendero|secreto
+Y:H:Bosque
+N:Q:cumbre|niebla|altura|nevada|nubes
+Y:H:Montana
+N:Q:arena|palmera|playa|sol brilla
+Y:H:Playa
+N:H:

@@ -8,14 +8,14 @@ Tesoro: Tesoro
 
 UBICACIONES Y PISTAS:
 ----------------------------------------
-  Volcan: "El viento lleva cenizas al bosque cercano" [Visitado]
-  Cueva: "Las ruinas antiguas tienen la llave del tesoro" [Visitado]
-  Bosque: "La cueva guarda el siguiente paso en la oscuridad" [Visitado]
-  Playa: "El bosque esconde el primer secreto del tesoro" [Visitado]
-  Montana: "El volcan duerme bajo la cumbre nevada" [Visitado]
-  Lago: "La montana se refleja en mis aguas cristalinas" [Visitado]
+  Volcan: "El pasado aguarda entre columnas de piedra" [Visitado]
+  Cueva: "Las piedras que el tiempo olvido te mostraran el camino" [Visitado]
+  Bosque: "Busca donde el sol no llega" [Visitado]
+  Playa: "Busca donde los arboles guardan el primer secreto" [Visitado]
+  Montana: "Sigue hacia el fuego que duerme bajo la tierra" [Visitado]
+  Lago: "Las piedras antiguas te esperan al otro lado del sendero" [Visitado]
   Tesoro: "Has encontrado el brillante tesoro del pirata" [Visitado]
-  Ruinas: "El tesoro aguarda al final del camino" [Visitado]
+  Ruinas: "El brillo del oro aguarda al final del sendero" [Visitado]
 
 CAMINO MAS CORTO (BFS):
 ----------------------------------------
@@ -34,10 +34,10 @@ Playa -> Bosque -> Cueva -> Ruinas -> Tesoro
 
 SECUENCIA DE PISTAS:
 ----------------------------------------
-  1. Playa: "El bosque esconde el primer secreto del tesoro"
-  2. Bosque: "La cueva guarda el siguiente paso en la oscuridad"
-  3. Cueva: "Las ruinas antiguas tienen la llave del tesoro"
-  4. Ruinas: "El tesoro aguarda al final del camino"
+  1. Playa: "Busca donde los arboles guardan el primer secreto"
+  2. Bosque: "Busca donde el sol no llega"
+  3. Cueva: "Las piedras que el tiempo olvido te mostraran el camino"
+  4. Ruinas: "El brillo del oro aguarda al final del sendero"
   5. Tesoro: "Has encontrado el brillante tesoro del pirata"
 
 ==================================================

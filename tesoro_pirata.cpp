@@ -308,106 +308,202 @@ public:
 };
 
 // ============================================================
-// 6. ARBOL DE DECISION (BST)
+// 6. ARBOL DE DECISION (preguntas SI/NO sobre la pista)
 // ============================================================
-struct NodoArbol {
-    char* palabra_clave;
+struct NodoDecision {
+    char** claves;
+    int num_claves;
     char* ubicacion;
-    NodoArbol* izquierdo;
-    NodoArbol* derecho;
-
-    NodoArbol(const char* pal, const char* ubi)
-        : palabra_clave(copiar_cadena(pal)), ubicacion(copiar_cadena(ubi)),
-          izquierdo(NULL), derecho(NULL) {}
-
-    ~NodoArbol() {
-        delete[] palabra_clave;
-        delete[] ubicacion;
-    }
+    bool es_hoja;
+    NodoDecision* rama_si;
+    NodoDecision* rama_no;
 };
 
 class ArbolDecision {
 private:
-    NodoArbol* raiz;
+    NodoDecision* raiz;
     int cont_nodos;
 
-    void insertar(NodoArbol*& nodo, const char* palabra, const char* ubi) {
-        if (nodo == NULL) {
-            nodo = new NodoArbol(palabra, ubi);
-            cont_nodos++;
-            return;
+    bool es_linea_arbol_valida(const char* linea) const {
+        if (linea == NULL || linea[0] == '\0') return false;
+        const char* l = linea;
+        while (*l == ' ' || *l == '\t') l++;
+        if (*l == '#' || *l == '\0') return false;
+        return (strncmp(l, "Q:", 2) == 0 ||
+                strncmp(l, "Y:", 2) == 0 ||
+                strncmp(l, "N:", 2) == 0);
+    }
+
+    bool leer_linea_arbol(ifstream& file, char* linea) const {
+        while (file.getline(linea, 512)) {
+            char* limpia = trim(linea);
+            if (es_linea_arbol_valida(limpia)) {
+                strcpy(linea, limpia);
+                delete[] limpia;
+                return true;
+            }
+            delete[] limpia;
         }
-        int cmp = strcmp(palabra, nodo->palabra_clave);
-        if (cmp < 0)
-            insertar(nodo->izquierdo, palabra, ubi);
-        else if (cmp > 0)
-            insertar(nodo->derecho, palabra, ubi);
+        return false;
     }
 
-    NodoArbol* buscar(NodoArbol* nodo, const char* palabra) const {
+    void parsear_claves(const char* texto, char*** claves, int& num) const {
+        char* copia = copiar_cadena(texto);
+        char** partes = NULL;
+        num = partir_cadena(copia, '|', &partes);
+        *claves = new char*[num];
+        for (int i = 0; i < num; i++) {
+            char* clave_min = minusculas(trim(partes[i]));
+            (*claves)[i] = clave_min;
+            delete[] partes[i];
+        }
+        delete[] partes;
+        delete[] copia;
+    }
+
+    NodoDecision* crear_hoja(const char* ubicacion) {
+        NodoDecision* nodo = new NodoDecision;
+        nodo->claves = NULL;
+        nodo->num_claves = 0;
+        nodo->ubicacion = (ubicacion != NULL && ubicacion[0] != '\0')
+            ? copiar_cadena(ubicacion) : NULL;
+        nodo->es_hoja = true;
+        nodo->rama_si = NULL;
+        nodo->rama_no = NULL;
+        cont_nodos++;
+        return nodo;
+    }
+
+    NodoDecision* crear_pregunta(const char* claves_texto) {
+        NodoDecision* nodo = new NodoDecision;
+        parsear_claves(claves_texto, &nodo->claves, nodo->num_claves);
+        nodo->ubicacion = NULL;
+        nodo->es_hoja = false;
+        nodo->rama_si = NULL;
+        nodo->rama_no = NULL;
+        cont_nodos++;
+        return nodo;
+    }
+
+    NodoDecision* parsear_rama(const char* linea, ifstream& file) {
+        if (strncmp(linea, "Y:H:", 4) == 0 || strncmp(linea, "N:H:", 4) == 0)
+            return crear_hoja(linea + 4);
+        if (strncmp(linea, "Y:Q:", 4) == 0) {
+            char pseudo[512];
+            strcpy(pseudo, "Q:");
+            strcat(pseudo, linea + 4);
+            return parsear_nodo(pseudo, file);
+        }
+        if (strncmp(linea, "N:Q:", 4) == 0) {
+            char pseudo[512];
+            strcpy(pseudo, "Q:");
+            strcat(pseudo, linea + 4);
+            return parsear_nodo(pseudo, file);
+        }
+        return NULL;
+    }
+
+    NodoDecision* parsear_nodo(const char* linea, ifstream& file) {
+        if (strncmp(linea, "Q:", 2) != 0) return NULL;
+
+        NodoDecision* nodo = crear_pregunta(linea + 2);
+
+        char rama_si_linea[512];
+        if (!leer_linea_arbol(file, rama_si_linea)) return nodo;
+        nodo->rama_si = parsear_rama(rama_si_linea, file);
+
+        char rama_no_linea[512];
+        if (!leer_linea_arbol(file, rama_no_linea)) return nodo;
+        nodo->rama_no = parsear_rama(rama_no_linea, file);
+
+        return nodo;
+    }
+
+    bool cumple_pregunta(const char* pista_min, NodoDecision* nodo) const {
+        for (int i = 0; i < nodo->num_claves; i++) {
+            if (strstr(pista_min, nodo->claves[i]) != NULL)
+                return true;
+        }
+        return false;
+    }
+
+    char* interpretar_nodo(NodoDecision* nodo, const char* pista_min) const {
         if (nodo == NULL) return NULL;
-        int cmp = strcmp(palabra, nodo->palabra_clave);
-        if (cmp == 0) return nodo;
-        if (cmp < 0) return buscar(nodo->izquierdo, palabra);
-        return buscar(nodo->derecho, palabra);
+        if (nodo->es_hoja) return nodo->ubicacion;
+        if (cumple_pregunta(pista_min, nodo))
+            return interpretar_nodo(nodo->rama_si, pista_min);
+        return interpretar_nodo(nodo->rama_no, pista_min);
     }
 
-    void liberar(NodoArbol* nodo) {
+    void liberar(NodoDecision* nodo) {
         if (nodo == NULL) return;
-        liberar(nodo->izquierdo);
-        liberar(nodo->derecho);
+        if (nodo->claves != NULL) {
+            for (int i = 0; i < nodo->num_claves; i++)
+                delete[] nodo->claves[i];
+            delete[] nodo->claves;
+        }
+        if (nodo->ubicacion != NULL) delete[] nodo->ubicacion;
+        liberar(nodo->rama_si);
+        liberar(nodo->rama_no);
         delete nodo;
     }
 
-    void inorden(NodoArbol* nodo, const char*** palabras, const char*** ubicaciones, int& idx) const {
+    void mostrar_nodo(NodoDecision* nodo, int nivel, const char* etiqueta) const {
         if (nodo == NULL) return;
-        inorden(nodo->izquierdo, palabras, ubicaciones, idx);
-        (*palabras)[idx] = nodo->palabra_clave;
-        (*ubicaciones)[idx] = nodo->ubicacion;
-        idx++;
-        inorden(nodo->derecho, palabras, ubicaciones, idx);
+        for (int i = 0; i < nivel; i++) cout << "  ";
+        if (etiqueta != NULL) cout << etiqueta << " ";
+
+        if (nodo->es_hoja) {
+            cout << "-> " << (nodo->ubicacion ? nodo->ubicacion : "(sin resultado)") << endl;
+            return;
+        }
+
+        cout << "Pregunta: ";
+        for (int i = 0; i < nodo->num_claves; i++) {
+            if (i > 0) cout << " / ";
+            cout << "\"" << nodo->claves[i] << "\"";
+        }
+        cout << endl;
+
+        mostrar_nodo(nodo->rama_si, nivel + 1, "SI:");
+        mostrar_nodo(nodo->rama_no, nivel + 1, "NO:");
     }
 
 public:
     ArbolDecision() : raiz(NULL), cont_nodos(0) {}
     ~ArbolDecision() { liberar(raiz); }
 
-    void insertar(const char* palabra, const char* ubi) {
-        char* pal_min = minusculas(palabra);
-        insertar(raiz, pal_min, ubi);
-        delete[] pal_min;
-    }
+    bool cargar(const char* archivo) {
+        ifstream file(archivo);
+        if (!file.is_open()) return false;
 
-    char* buscar_ubicacion(const char* palabra) const {
-        char* pal_min = minusculas(palabra);
-        NodoArbol* nodo = buscar(raiz, pal_min);
-        delete[] pal_min;
-        return (nodo != NULL) ? nodo->ubicacion : NULL;
+        char linea[512];
+        while (leer_linea_arbol(file, linea)) {
+            if (strncmp(linea, "Q:", 2) == 0) {
+                raiz = parsear_nodo(linea, file);
+                break;
+            }
+        }
+        file.close();
+        return raiz != NULL;
     }
 
     char* interpretar(const char* pista) const {
+        if (raiz == NULL || pista == NULL) return NULL;
         char* pista_min = minusculas(pista);
-        char** palabras = NULL;
-        int num_palabras = partir_cadena(pista_min, ' ', &palabras);
+        char* resultado = interpretar_nodo(raiz, pista_min);
         delete[] pista_min;
-
-        char* resultado = NULL;
-        for (int i = 0; i < num_palabras; i++) {
-            resultado = buscar_ubicacion(palabras[i]);
-            delete[] palabras[i];
-            if (resultado != NULL) break;
-        }
-        delete[] palabras;
         return resultado;
     }
 
     int obtener_cont_nodos() const { return cont_nodos; }
 
-    void mostrar(const char*** palabras, const char*** ubicaciones) const {
-        *palabras = new const char*[cont_nodos];
-        *ubicaciones = new const char*[cont_nodos];
-        int idx = 0;
-        inorden(raiz, palabras, ubicaciones, idx);
+    void mostrar() const {
+        if (raiz == NULL) {
+            cout << "     (arbol vacio)" << endl;
+            return;
+        }
+        mostrar_nodo(raiz, 1, "RAIZ:");
     }
 };
 
@@ -638,30 +734,10 @@ public:
     }
 
     void cargar_arbol_decision(const char* archivo) {
-        ifstream file(archivo);
-        if (!file.is_open()) {
-            cerr << "  [ERROR] No se pudo abrir " << archivo << endl;
+        if (!arbol.cargar(archivo)) {
+            cerr << "  [ERROR] No se pudo cargar el arbol de decision: " << archivo << endl;
             return;
         }
-        char linea[256];
-        while (file.getline(linea, 256)) {
-            char* limpia = trim(linea);
-            if (es_comentario_o_vacio(limpia)) { delete[] limpia; continue; }
-
-            char** partes = NULL;
-            int num = partir_cadena(limpia, ',', &partes);
-            if (num == 2) {
-                char* palabra = trim(partes[0]);
-                char* ubicacion = trim(partes[1]);
-                arbol.insertar(palabra, ubicacion);
-                delete[] palabra;
-                delete[] ubicacion;
-            }
-            for (int i = 0; i < num; i++) delete[] partes[i];
-            delete[] partes;
-            delete[] limpia;
-        }
-        file.close();
         cout << "  [OK] Arbol de decision cargado: " << archivo << endl;
     }
 
@@ -1083,14 +1159,7 @@ public:
         delete[] nombres;
 
         cout << "  Arbol de decision (" << arbol.obtener_cont_nodos() << " nodos):" << endl;
-        const char** pals = NULL;
-        const char** ubis = NULL;
-        arbol.mostrar(&pals, &ubis);
-        for (int i = 0; i < arbol.obtener_cont_nodos(); i++) {
-            cout << "     \"" << pals[i] << "\" -> " << ubis[i] << endl;
-        }
-        delete[] pals;
-        delete[] ubis;
+        arbol.mostrar();
 
         const char* inicio = "Playa";
         const char* destino = "Tesoro";
