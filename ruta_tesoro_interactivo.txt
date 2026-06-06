@@ -1,0 +1,27 @@
+==================================================
+  RUTA AL TESORO DEL PIRATA (MODO INTERACTIVO)
+==================================================
+
+Ruta completa:
+Playa -> Bosque -> Cueva -> Ruinas -> Tesoro
+
+Costo total: 8 monedas de oro
+
+Pistas encontradas:
+  1. Busca donde los arboles guardan el primer secreto
+  2. Busca donde el sol no llega
+  3. Las piedras que el tiempo olvido te mostraran el camino
+  4. El brillo del oro aguarda al final del sendero
+  5. Has encontrado el brillante tesoro del pirata
+
+Todas las ubicaciones:
+  [ ] Volcan
+  [X] Cueva
+  [X] Bosque
+  [X] Playa
+  [ ] Montana
+  [ ] Lago
+  [X] Tesoro
+  [X] Ruinas
+
+==================================================
